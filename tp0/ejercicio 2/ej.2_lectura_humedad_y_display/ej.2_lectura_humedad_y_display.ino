@@ -2,18 +2,17 @@
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
+#include <Adafruit_GFX.h>
 #include "DHT.h"
 
+#define SCREEN_WIDTH 128
+#define SCREEN_HIGHT 64
 
-#define OLED_MOSI 9 //seteo pines del display
-#define OLED_CLK 10
-#define OLED_DC 11
-#define OLED_CS 12
-#define OLED_RESET 13
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HIGHT, &Wire, -1);
+
 
 #define DHTTYPE DHT11 //seteo pines sensor de humedad
-#define DHTPIN 23
+#define DHTPIN 16
 DHT dht(DHTPIN, DHTTYPE);
 
 float lecturaHumedad;

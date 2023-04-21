@@ -1,15 +1,15 @@
-#include <SPI.h>
+//katz y perez voges
+
+#include <Adafruit_GFX.h>
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
-#define OLED_MOSI 9
-#define OLED_CLK 10
-#define OLED_DC 11
-#define OLED_CS 12
-#define OLED_RESET 13
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+#define SCREEN_WIDTH 128
+#define SCREEN_HIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HIGHT, &Wire, -1);
 
 void setup() {
-  display.begin(SSD1306_SWITCHCAPVCC); // Inicia el display OLED
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Inicia el display OLED
   display.clearDisplay(); // Borrar imagen en el OLED
 
 }
