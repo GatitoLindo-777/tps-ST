@@ -7,15 +7,13 @@
 #define DHTTYPE DHT11
 #define DHTPIN 23
 DHT dht(DHTPIN, DHTTYPE);
-#define PIN_BTN1 11
-#define PIN_BTN2 12
+#define PIN_BTN1 34
+#define PIN_BTN2 35
 
-#define OLED_MOSI 9
-#define OLED_CLK 10
-#define OLED_DC 11
-#define OLED_CS 12
-#define OLED_RESET 13
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+#define SCREEN_WIDTH 128
+#define SCREEN_HIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HIGHT, &Wire, -1);
 
 int estado;
 #define PANTALLA1 0
@@ -34,17 +32,19 @@ void setup() {
   Serial.begin (9600);
   Serial.println("Iniciando...");
   dht.begin(); //inicializo el sensor de temperatura
-  display.begin(SSD1306_SWITCHCAPVCC); //Inicializamos el oled
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //Inicializamos el oled
   display.clearDisplay(); // Borrar imagen en el OLED
 
   pinMode(PIN_BTN1, INPUT);
   pinMode(PIN_BTN2, INPUT);
   flag = 1;
+  estado = PANTALLA1;
 }
 
 void loop() {
   temp = dht.readTemperature(); //leemos la temperatura
   //Serial.print("Temperatura ");
+  //Serial.println(temp);
 
 
   switch (estado) {
@@ -63,6 +63,7 @@ void loop() {
 
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
         estado = COMPROBACION_BTN_1;
+        Serial.println(PANTALLA2);
       }
       break;
     case COMPROBACION_BTN_1:
@@ -81,6 +82,10 @@ void loop() {
       }
       break;
     case PANTALLA2:
+    delay(100);
+     if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
+      }
       if (digitalRead(PIN_BTN1) == 0) {
         estado = COMPROBACION_BTN_SUMA;
       }
@@ -93,9 +98,7 @@ void loop() {
       display.println(VU);
       display.clearDisplay();
 
-      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
-        estado = COMPROBACION_BTN_1;
-      }
+      
       break;
     /*case COMPROBACION_BTN_2:
         delay(10);
@@ -118,4 +121,6 @@ void loop() {
       }
       break;
   }
+  Serial.println(estado);
+  //Serial.println(VU);
 }
