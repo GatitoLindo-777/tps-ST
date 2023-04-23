@@ -1,9 +1,14 @@
+//katz y perez 
 #include <SPI.h>
 #include <DHT.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
+#include <Arduino.h>
+#include <ESP32Time.h>
+#include "time.h"
+#include <WiFi.h>
 
 #define DHTTYPE DHT11
 #define DHTPIN 23
@@ -24,11 +29,23 @@ int estado;
 #define COMPROBACION_BTN_SUMA 4
 #define COMPROBACION_BTN_RESTA 5
 float temp;
-int VU = 27;
 int lecturaBtn1;
 int lecturaBtn2;
 int flag;
 long tiempoActual;
+
+void pedir_lahora(void);
+void setup_rtc_ntp(void);
+struct tm timeinfo;
+ESP32Time rtc;
+/// time
+long unsigned int timestamp; // hora
+const char servidor = "south-america.pool.ntp.org";
+const long gmtOffset_sec = -10800;
+const int daylightOffset_sec = 0;
+
+const char* red = "ORT-IoT";
+const char* clave = "OrtIOTnew22$2";
 
 void setup() {
   Serial.begin (9600);
@@ -41,28 +58,28 @@ void setup() {
   pinMode(PIN_BTN2, INPUT);
   flag = 1;
   estado = PANTALLA1;
+  
+  display.setTextSize(1); // Tamaño del texto
+  display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
+  
+  actual_millis = millis();
+  initWiFi();
+  setup_rtc_ntp();
 }
 
 void loop() {
+  pedirHora();
   temp = dht.readTemperature(); //leemos la temperatura
-  //Serial.print("Temperatura ");
-  //Serial.println(temp);
-
 
   switch (estado) {
     case PANTALLA1:
-      display.setTextSize(1); // Tamaño del texto
-      display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
-      display.setCursor(5, 25);
-      display.println("VR:");
-      display.setCursor(10, 25);
+      display.setCursor(5, 10);
+      display.println("temp:");
+      display.setCursor(10, 10);
       display.println(temp);
-      display.setCursor(5, 35);
-      display.println("VU:"); // Escribimos en el buffer el texto con la posición (X,Y) en la pantalla
-      display.setCursor(10, 35);
-      display.println(VU);
+      printTime();
       display.clearDisplay();
-
+      
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
         estado = COMPROBACION_BTN_1;
         Serial.println(PANTALLA2);
@@ -89,20 +106,16 @@ void loop() {
      if (digitalRead(PIN_BTN1) == 0){
       tiempoActual = millis();
       if (digitalRead(PIN_BTN1) == 0 && millis() - tiempoActual > 200) {
-        estado = COMPROBACION_BTN_SUMA;
+        estado = COMPROBACION_BTN_HORAS;
       }
      }
      if (digitalRead(PIN_BTN2) == 0) {
         tiempoActual = millis();
       if (digitalRead(PIN_BTN2) == 0 && millis() - tiempoActual > 200) {
-        estado = COMPROBACION_BTN_RESTA;
+        estado = COMPROBACION_BTN_MINUTOS;
       }
      }
-      display.setCursor(5, 35);
-      display.println("VU:"); // Escribimos en el buffer el texto con la posición (X,Y) en la pantalla
-      display.setCursor(10, 35);
-      display.println(VU);
-      display.clearDisplay();
+      printTime();
 
       
       break;
@@ -114,17 +127,53 @@ void loop() {
         break;*/
     case COMPROBACION_BTN_SUMA:
       if (digitalRead(PIN_BTN1) == 1) {
-        VU = VU + 1;
+        gmtOffset_sec = gmtOffset_sec + 3600;
         estado = PANTALLA2;
       }
       break;
     case COMPROBACION_BTN_RESTA:
       if (digitalRead(PIN_BTN2) == 1) {
-        VU = VU - 1;
+        gmtOffset_sec = gmtOffset_sec - 3600;
         estado = PANTALLA2;
       }
       break;
   }
-  Serial.println(estado);
-  //Serial.println(VU);
+}
+void initWiFi() {
+  WiFi.begin(red , clave);
+  Serial.println(WiFi.localIP());
+  Serial.println();
+}
+
+void setup_rtc_ntp()
+{
+  // init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, servidor);
+  timestamp = time(NULL);
+  rtc.setTime(timestamp + gmtOffset_sec);
+}
+
+void pedirHora()
+{
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("veo la hora del rtc interno ");
+    timestamp = rtc.getEpoch() - gmtOffset_sec;
+    timeinfo = rtc.getTimeStruct();
+     Serial.println(&timeinfo, "%H:%M:%S");
+  }
+  else
+  {
+    Serial.print("NTP Time:");
+    timestamp = time(NULL);
+    Serial.println(&timeinfo, "%H:%M:%S");
+  }
+}
+  
+void printTime (){
+  display.setCursor(5, 20);
+  display.println("tiempo:");
+  display.setCursor(10, 20);
+  display.println(&timeinfo, "%H:%M:%S");
+  display.clearDisplay();
 }
