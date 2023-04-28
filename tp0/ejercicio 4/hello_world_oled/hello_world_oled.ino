@@ -36,7 +36,7 @@ void setup() {
   dht.begin(); //inicializo el sensor de temperatura
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //Inicializamos el oled
   display.clearDisplay(); // Borrar imagen en el OLED
-
+  
   pinMode(PIN_BTN1, INPUT);
   pinMode(PIN_BTN2, INPUT);
   flag = 1;
@@ -51,16 +51,17 @@ void loop() {
 
   switch (estado) {
     case PANTALLA1:
-      display.setTextSize(1); // Tamaño del texto
+      display.setTextSize(2); // Tamaño del texto
       display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
-      display.setCursor(5, 25);
+      display.setCursor(5, 10);
       display.println("VR:");
-      display.setCursor(10, 25);
+      display.setCursor(40, 10);
       display.println(temp);
       display.setCursor(5, 35);
       display.println("VU:"); // Escribimos en el buffer el texto con la posición (X,Y) en la pantalla
-      display.setCursor(10, 35);
+      display.setCursor(40, 35);
       display.println(VU);
+      display.display();
       display.clearDisplay();
 
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
@@ -87,21 +88,18 @@ void loop() {
         estado = COMPROBACION_BTN_1;
       }
      if (digitalRead(PIN_BTN1) == 0){
-      tiempoActual = millis();
-      if (digitalRead(PIN_BTN1) == 0 && millis() - tiempoActual > 200) {
+        tiempoActual = millis();
         estado = COMPROBACION_BTN_SUMA;
-      }
      }
      if (digitalRead(PIN_BTN2) == 0) {
         tiempoActual = millis();
-      if (digitalRead(PIN_BTN2) == 0 && millis() - tiempoActual > 200) {
         estado = COMPROBACION_BTN_RESTA;
-      }
      }
       display.setCursor(5, 35);
       display.println("VU:"); // Escribimos en el buffer el texto con la posición (X,Y) en la pantalla
-      display.setCursor(10, 35);
+      display.setCursor(40, 35);
       display.println(VU);
+      display.display();
       display.clearDisplay();
 
       
@@ -113,15 +111,21 @@ void loop() {
         }
         break;*/
     case COMPROBACION_BTN_SUMA:
-      if (digitalRead(PIN_BTN1) == 1) {
+      if (digitalRead(PIN_BTN1) == 1 && millis() - tiempoActual > 200) {
         VU = VU + 1;
         estado = PANTALLA2;
+        if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
+      }
       }
       break;
     case COMPROBACION_BTN_RESTA:
-      if (digitalRead(PIN_BTN2) == 1) {
+      if (digitalRead(PIN_BTN2) == 1 && millis() - tiempoActual > 200) {
         VU = VU - 1;
         estado = PANTALLA2;
+      }
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
       }
       break;
   }
