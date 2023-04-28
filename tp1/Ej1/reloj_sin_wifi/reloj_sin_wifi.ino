@@ -1,4 +1,4 @@
-//katz y perez 
+//katz y perez
 #include <SPI.h>
 #include <DHT.h>
 #include <Wire.h>
@@ -50,10 +50,10 @@ void setup() {
   pinMode(PIN_BTN2, INPUT);
   flag = 1;
   estado = PANTALLA1;
-  
+
   display.setTextSize(1); // Tamaño del texto
   display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
-  
+
   actual_millis = millis();
 }
 
@@ -64,13 +64,25 @@ void loop() {
 
   switch (estado) {
     case PANTALLA1:
-      display.setCursor(5, 10);
+      display.setCursor(05, 0);
       display.println("temp:");
-      display.setCursor(10, 10);
+      display.setCursor(40, 0);
       display.println(temp);
-      printTime();
+      display.setCursor(5, 30);
+      display.println("tiempo:");
+      display.setCursor(60, 30);
+      display.println(hs);
+      display.setCursor(70, 30);
+      display.println(":");
+      display.setCursor(75, 30);
+      display.println(minutos);
+      display.setCursor(85, 30);
+      display.println(":");
+      display.setCursor(90, 30);
+      display.println(seg);
+      display.display();
       display.clearDisplay();
-      
+
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
         estado = COMPROBACION_BTN_1;
         Serial.println(PANTALLA2);
@@ -87,28 +99,37 @@ void loop() {
           Serial.print("pantalla1");
           flag = 1;
         }
-        Serial.print("pantalla2");
+        //Serial.print("pantalla2");
       }
       break;
     case PANTALLA2:
-     if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
         estado = COMPROBACION_BTN_1;
       }
-     if (digitalRead(PIN_BTN1) == 0){
-      tiempoActual = millis();
-      if (digitalRead(PIN_BTN1) == 0 && millis() - tiempoActual > 200) {
+      if (digitalRead(PIN_BTN1) == 0) {
+        tiempoActual = millis();
         estado = COMPROBACION_BTN_HORAS;
       }
-     }
-     if (digitalRead(PIN_BTN2) == 0) {
+      if (digitalRead(PIN_BTN2) == 0) {
         tiempoActual = millis();
-      if (digitalRead(PIN_BTN2) == 0 && millis() - tiempoActual > 200) {
         estado = COMPROBACION_BTN_MINUTOS;
       }
-     }
-      printTime();
+      display.setCursor(5, 30);
+      display.println("tiempo:");
+      display.setCursor(60, 30);
+      display.println(hs);
+      display.setCursor(70, 30);
+      display.println(":");
+      display.setCursor(75, 30);
+      display.println(minutos);
+      display.setCursor(85, 30);
+      display.println(":");
+      display.setCursor(90, 30);
+      display.println(seg);
+      display.display();
+      display.clearDisplay();
 
-      
+
       break;
     /*case COMPROBACION_BTN_2:
         delay(10);
@@ -117,49 +138,47 @@ void loop() {
         }
         break;*/
     case COMPROBACION_BTN_HORAS:
-      if (digitalRead(PIN_BTN1) == 1) {
+      if (digitalRead(PIN_BTN1) == 1 && millis() - tiempoActual > 200) {
         hs = hs + 1;
         estado = PANTALLA2;
       }
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
+      }
       break;
     case COMPROBACION_BTN_MINUTOS:
-      if (digitalRead(PIN_BTN2) == 1) {
+      if (digitalRead(PIN_BTN2) == 1 && millis() - tiempoActual > 200) {
         minutos = minutos + 1;
         estado = PANTALLA2;
       }
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
+      }
       break;
   }
-}
-  
-  
-void printTime (){
-   display.setCursor(5, 20);
-   display.println("tiempo:" + hs); 
-   display.setCursor(15, 20);
-   display.println(":" + minutos);
-   display.setCursor(25, 20);
-   display.println(":" + seg);
-   display.clearDisplay();
+  //Serial.print(minutos);
 }
 
-void segundos(){
+
+void segundos() {
   mil = millis() - actual_millis;
-  if (mil > 1000){
+  if (mil > 1000) {
     seg = seg + 1;
     actual_millis = millis();
+    //Serial.println(seg);
   }
 }
 
-void reloj(){
-  if (seg >= 60){
+void reloj() {
+  if (seg >= 60) {
     seg = 0;
     minutos = minutos + 1;
   }
-  if (minutos >= 60){
+  if (minutos >= 60) {
     minutos = 0;
     hs = hs + 1;
   }
-  if (hs >= 24){
+  if (hs >= 24) {
     hs = 0;
   }
 }
