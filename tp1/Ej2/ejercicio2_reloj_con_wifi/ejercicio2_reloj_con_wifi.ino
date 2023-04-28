@@ -40,9 +40,9 @@ struct tm timeinfo;
 ESP32Time rtc;
 /// time
 long unsigned int timestamp; // hora
-const char servidor = "south-america.pool.ntp.org";
-const long gmtOffset_sec = -10800;
+long gmtOffset_sec = -10800;
 const int daylightOffset_sec = 0;
+const char *servidor = "south-america.pool.ntp.org";
 
 const char* red = "ORT-IoT";
 const char* clave = "OrtIOTnew22$2";
@@ -62,20 +62,21 @@ void setup() {
   display.setTextSize(1); // Tamaño del texto
   display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
   
-  actual_millis = millis();
+  tiempoActual = millis();
   initWiFi();
   setup_rtc_ntp();
 }
 
 void loop() {
+  setup_rtc_ntp();
   pedirHora();
   temp = dht.readTemperature(); //leemos la temperatura
 
   switch (estado) {
     case PANTALLA1:
-      display.setCursor(5, 10);
+      display.setCursor(5, 0);
       display.println("temp:");
-      display.setCursor(10, 10);
+      display.setCursor(40, 0);
       display.println(temp);
       printTime();
       display.clearDisplay();
@@ -105,15 +106,11 @@ void loop() {
       }
      if (digitalRead(PIN_BTN1) == 0){
       tiempoActual = millis();
-      if (digitalRead(PIN_BTN1) == 0 && millis() - tiempoActual > 200) {
-        estado = COMPROBACION_BTN_HORAS;
-      }
+        estado = COMPROBACION_BTN_SUMA;
      }
      if (digitalRead(PIN_BTN2) == 0) {
         tiempoActual = millis();
-      if (digitalRead(PIN_BTN2) == 0 && millis() - tiempoActual > 200) {
-        estado = COMPROBACION_BTN_MINUTOS;
-      }
+        estado = COMPROBACION_BTN_RESTA;
      }
       printTime();
 
@@ -126,15 +123,21 @@ void loop() {
         }
         break;*/
     case COMPROBACION_BTN_SUMA:
-      if (digitalRead(PIN_BTN1) == 1) {
+      if (digitalRead(PIN_BTN1) == 1 && millis() - tiempoActual > 200) {
         gmtOffset_sec = gmtOffset_sec + 3600;
         estado = PANTALLA2;
       }
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
+      }
       break;
     case COMPROBACION_BTN_RESTA:
-      if (digitalRead(PIN_BTN2) == 1) {
+      if (digitalRead(PIN_BTN2) == 1 && millis() - tiempoActual > 200) {
         gmtOffset_sec = gmtOffset_sec - 3600;
         estado = PANTALLA2;
+      }
+      if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
+        estado = COMPROBACION_BTN_1;
       }
       break;
   }
@@ -173,7 +176,8 @@ void pedirHora()
 void printTime (){
   display.setCursor(5, 20);
   display.println("tiempo:");
-  display.setCursor(10, 20);
+  display.setCursor(40, 20);
   display.println(&timeinfo, "%H:%M:%S");
+  display.display();
   display.clearDisplay();
 }
