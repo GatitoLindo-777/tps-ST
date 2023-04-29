@@ -68,7 +68,6 @@ void setup() {
 }
 
 void loop() {
-  setup_rtc_ntp();
   pedirHora();
   temp = dht.readTemperature(); //leemos la temperatura
 
@@ -125,6 +124,7 @@ void loop() {
     case COMPROBACION_BTN_SUMA:
       if (digitalRead(PIN_BTN1) == 1 && millis() - tiempoActual > 200) {
         gmtOffset_sec = gmtOffset_sec + 3600;
+        setup_rtc_ntp();
         estado = PANTALLA2;
       }
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
@@ -134,6 +134,7 @@ void loop() {
     case COMPROBACION_BTN_RESTA:
       if (digitalRead(PIN_BTN2) == 1 && millis() - tiempoActual > 200) {
         gmtOffset_sec = gmtOffset_sec - 3600;
+        setup_rtc_ntp();
         estado = PANTALLA2;
       }
       if (digitalRead(PIN_BTN1) == 0 && digitalRead(PIN_BTN2) == 0) {
@@ -141,7 +142,8 @@ void loop() {
       }
       break;
   }
-}
+ }
+
 void initWiFi() {
   WiFi.begin(red , clave);
   Serial.println(WiFi.localIP());
