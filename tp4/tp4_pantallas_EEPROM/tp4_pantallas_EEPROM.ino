@@ -5,7 +5,7 @@
 #include <DHT.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_SSD1306.h>
+#include "Adafruit_SSD1306.h"
 #include <Adafruit_GFX.h>
 #include <EEPROM.h>
 #define EEPROM_SIZE 32
