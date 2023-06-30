@@ -5,7 +5,7 @@
 #include <DHT.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_SSD1306.h>
+#include "Adafruit_SSD1306.h"
 #include <Adafruit_GFX.h>
 #include <EEPROM.h>
 #define EEPROM_SIZE 32
@@ -43,7 +43,7 @@ void setup() {
   display.clearDisplay(); // Borrar imagen en el OLED
 
   EEPROM.begin(EEPROM_SIZE);
-  VU = EEPROM.read();
+  VU = EEPROM.read(1);
   
   pinMode(PIN_BTN1, INPUT);
   pinMode(PIN_BTN2, INPUT);
@@ -59,7 +59,7 @@ void loop() {
 
   switch (estado) {
     case PANTALLA1:
-      display.setTextSize(2); // Tamaño del texto
+      display.setTextSize(1); // Tamaño del texto
       display.setTextColor(WHITE); // Definir color del texto (WHITE-BLACK)
       display.setCursor(5, 10);
       display.println("VR:");
@@ -86,7 +86,8 @@ void loop() {
         } else if (flag == 2) {
           estado = PANTALLA1;
           Serial.print("pantalla1");
-          EEPROM.write(VU);
+          EEPROM.write(1, VU);
+          EEPROM.commit();
           flag = 1;
         }
         Serial.print("pantalla2");
