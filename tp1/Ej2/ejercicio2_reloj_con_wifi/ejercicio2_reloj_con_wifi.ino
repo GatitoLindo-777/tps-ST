@@ -44,8 +44,8 @@ long gmtOffset_sec = -10800;
 const int daylightOffset_sec = 0;
 const char *servidor = "south-america.pool.ntp.org";
 
-const char* red = "ORT-IoT";
-const char* clave = "OrtIOTnew22$2";
+const char* red = "PixelGaspar";
+const char* clave = "aaaaa12345";
 
 void setup() {
   Serial.begin (9600);

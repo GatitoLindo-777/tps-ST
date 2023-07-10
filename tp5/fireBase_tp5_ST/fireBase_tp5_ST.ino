@@ -41,8 +41,8 @@ long tiempoActual;
 #include "addons/RTDBHelper.h"
 
 // Insert your network credentials
-#define WIFI_SSID "BJ2 5.8Ghz"
-#define WIFI_PASSWORD "Benitojuarez"
+const char* WIFI_SSID "PixelGaspar"
+const char* WIFI_PASSWORD "aaaaa12345"
 
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyAn3racaSbJKQIphvrENv_wThfYT6J-wsI"
@@ -66,6 +66,7 @@ String uid;
 String databasePath;
 // Database child nodes
 String tempPath = "/temperature";
+String timePath = "/timestamp";
 
 // Parent Node (to be updated in every loop)
 String parentPath;
@@ -149,7 +150,7 @@ void loop() {
     parentPath = databasePath + "/" + String(timestamp);
 
     json.set(tempPath.c_str(), String(temp));
-    json.set(timePath, String(timestamp));
+       json.set(timePath, String(timestamp));
   }
 
 
