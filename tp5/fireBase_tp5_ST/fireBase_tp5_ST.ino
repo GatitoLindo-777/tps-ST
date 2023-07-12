@@ -1,4 +1,4 @@
-//katz, katon, perez, perez
+//katz,perez vogues
 
 #include <SPI.h>
 #include <DHT.h>
@@ -41,8 +41,11 @@ long tiempoActual;
 #include "addons/RTDBHelper.h"
 
 // Insert your network credentials
-const char* WIFI_SSID "PixelGaspar"
-const char* WIFI_PASSWORD "aaaaa12345"
+//const char* WIFI_SSID "a"
+//const char* WIFI_PASSWORD "12345678"
+
+#define WIFI_SSID "a"
+#define WIFI_PASSWORD "12345678"
 
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyAn3racaSbJKQIphvrENv_wThfYT6J-wsI"
